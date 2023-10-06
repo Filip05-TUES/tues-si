@@ -67,7 +67,45 @@ describe('BettingService', () => {
   });
 
   // group 1
-  describe('delete', () => {});
+  describe('delete', () => {
+    let service;
+    let t1;
+    let t2;
+  
+    beforeEach(() => {
+      service = new BettingService();
+      t1 = service.createTable({
+        minBet: 1,
+        maxBet: 2,
+      });
+      t2 = service.createTable({
+        minBet: 3,
+        maxBet: 4,
+      });
+    });
+  
+    it('should delete a table', () => {
+      service.delete(t1.id);
+      expect(() => service.findOneOrFail(t1.id)).toThrowError(ErrorCodes.TableNotFoundError);
+    });
+  
+    it('should fail to delete a non-existent table', () => {
+      const nonExistentId = 'nonExistentTableId';
+      expect(() => service.delete(nonExistentId)).toThrowError(ErrorCodes.TableNotFoundError);
+    });
+  
+    it('should delete a table without affecting others', () => {
+      service.delete(t2.id);
+      expect(() => service.findOneOrFail(t2.id)).toThrowError(ErrorCodes.TableNotFoundError);
+      expect(() => service.findOneOrFail(t1.id)).not.toThrowError(ErrorCodes.TableNotFoundError);
+    });
+
+    it('should leave tables empty', () => {
+      service.delete(t1.id);
+      service.delete(t2.id);
+      expect(service.tables.length).toBe(0);
+    });
+  });
 
   // group 1
   describe('findOneOrFail', () => {});

@@ -86,6 +86,11 @@ export class BettingService {
     return 'SUCCESS';
   }
 
+  delete(tableId: string) {
+    this.findOneOrFail(tableId);
+    this.tables = this.tables.filter((x) => x.id !== tableId);
+  }
+
   tableList() {
     return this.tables.map((x) => x.id);
   }
